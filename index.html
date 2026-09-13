@@ -16,6 +16,15 @@
         .vf-stavenote:hover path { fill: #007acc; stroke: #007acc; }
         .interval-item { display: inline-block; padding: 10px 15px; margin: 5px; background: #f0f0f0; color: #333; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 18px; text-align: center; }
         .interval-item:hover { background: #007acc; color: #fff; border-color: #005999; }
+        
+        @media (max-width: 768px) {
+            body { margin: 10px; }
+            .global-controls { gap: 10px; }
+            .generator-box { width: 100% !important; max-width: 100% !important; padding: 10px; padding-top: 25px; }
+            .header-row > div { flex-wrap: wrap !important; white-space: normal !important; gap: 8px; }
+            .output { width: 100% !important; overflow-x: auto; justify-content: flex-start; }
+        }
+
         @media print {
             body { background: #fff; color: #000; }
             .global-controls { display: none !important; }
@@ -132,6 +141,11 @@
         function initAudio(callback) {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                if ('audioSession' in navigator) {
+                    navigator.audioSession.type = 'playback';
+                }
+
                 gainNode = audioCtx.createGain();
                 gainNode.gain.value = parseFloat(document.getElementById('volume').value);
                 gainNode.connect(audioCtx.destination);
@@ -340,12 +354,15 @@
                 }
             }
 
-            const boxWidth = contentWidth + 30;
-            box.style.width = boxWidth + 'px';
+            if (window.innerWidth > 768) {
+                box.style.width = (contentWidth + 30) + 'px';
+            } else {
+                box.style.width = '100%';
+            }
 
             const outputDiv = box.querySelector('.output');
             outputDiv.innerHTML = '';
-            outputDiv.style.width = contentWidth + 'px';
+            outputDiv.style.width = window.innerWidth <= 768 ? '100%' : contentWidth + 'px';
 
             const tonicObj = tonicData[tonicVal] || tonicData['c'];
             const baseOctave = 4;
